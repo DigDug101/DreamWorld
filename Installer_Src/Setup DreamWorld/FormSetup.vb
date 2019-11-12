@@ -37,12 +37,157 @@ Public Class Form1
 
 #Region "Version"
 
-    Private _MyVersion As String = "3.25"
+    Private _MyVersion As String = "3.26"
     Private _SimVersion As String = "0.9.1.0 Server Release Notes #defa235859889dbd"
 
 #End Region
 
 #Region "Declarations"
+
+    Private WithEvents ApacheProcess As New Process()
+
+    Private WithEvents IcecastProcess As New Process()
+
+    Private WithEvents ProcessMySql As Process = New Process()
+
+    Private WithEvents RobustProcess As New Process()
+
+    Private WithEvents UpdateProcess As New Process()
+
+    Private _Aborting As Boolean = False
+
+    Private _ApacheCrashCounter As Integer = 0
+
+    Private _ApacheExited As Integer = 0
+
+    Private _ApacheProcessID As Integer = 0
+
+    Private _ApacheUninstalling As Boolean = False
+
+    Private _ContentAvailable As Boolean = False
+
+    Private _CPUMAX As Single = 75
+
+    Private _CurSlashDir As String
+
+    Private _debugOn As Boolean = False
+
+    Private _DNSSTimer As Integer = 0
+
+    Private _Domain As String = "http://www.outworldz.com"
+
+    Private _ExitHandlerIsBusy As Boolean = False
+
+    Private _exitList As New ArrayList()
+
+    Private _ForceMerge As Boolean = False
+
+    Private _ForceParcel As Boolean = False
+
+    Private _ForceTerrain As Boolean = False
+
+    Private _gUseIcons As Boolean = False
+
+    Private _IcecastCrashCounter As Integer = 0
+
+    Private _IceCastExited As Integer = 0
+
+    Private _IcecastProcID As Integer
+
+    Private _Initted As Boolean = False
+
+    Private _invarient As CultureInfo = New CultureInfo("")
+
+    Private _IPv4Address As String
+
+    Private _IsRunning As Boolean = False
+
+    Private _KillSource As Boolean = False
+
+    Private _Language As New Culture
+
+    Private _MaxPortUsed As Integer = 0
+
+    Private _myFolder As String
+
+    Private _mySetting As New MySettings
+
+    Private _MysqlCrashCounter As Integer = 0
+
+    Private _MysqlExited As Integer = 0
+
+    Private _myUPnpMap As UPnp
+
+    Private _OldSimVersion As String
+
+    Private _OpensimBinPath As String
+
+    Private _PortsChanged As Boolean = True
+
+    Private _regionClass As RegionMaker
+
+    Private _RegionCrashCounter As Integer = 0
+
+    Private _regionForm As RegionList
+
+    Private _regionHandles As New Dictionary(Of Integer, String)
+
+    Private _RestartApache As Integer = 0
+
+    Private _RestartIceCast As Integer = 0
+
+    Private _RestartMysql As Integer = 0
+
+    Private _RestartNow As Boolean = False
+
+    Private _RestartRobust As Boolean
+
+    Private _RobustCrashCounter As Integer = 0
+
+    Private _RobustExited As Boolean = False
+
+    Private _RobustProcID As Integer
+
+    Private _SecureDomain As String = "https://outworldz.com"
+
+    ' https, which breaks stuff
+    Private _SelectedBox As String = ""
+
+    Private _StopMysql As Boolean = True
+
+    Private _UpdateView As Boolean = True
+
+    ' "" = Invariant Culture
+    Private _UserName As String = ""
+
+    Private _viewedSettings As Boolean = False
+
+    Private Adv As AdvancedForm
+
+    Private cpu As New PerformanceCounter
+
+    Private MyCPUCollection(181) As Double
+
+    ' Graph
+    Private MyRAMCollection(181) As Double
+
+    Private speed As Single
+
+    Private speed1 As Single
+
+    Private speed2 As Single
+
+    Private speed3 As Single
+
+    Private Update_version As String = Nothing
+
+    Private ws As NetServer
+
+    Public Event ApacheExited As EventHandler
+
+    Public Event Exited As EventHandler
+
+    Public Event RobustExited As EventHandler
 
     Public Enum SHOWWINDOWENUM As Integer
         SWHIDE = 0
@@ -61,88 +206,6 @@ Public Class Form1
         SWFORCEMINIMIZE = 11
         SWMAX = 11
     End Enum
-
-    Public Event ApacheExited As EventHandler
-
-    Public Event Exited As EventHandler
-
-    Public Event RobustExited As EventHandler
-
-    Private WithEvents UpdateProcess As New Process()
-    Private WithEvents ApacheProcess As New Process()
-    Private WithEvents IcecastProcess As New Process()
-    Private WithEvents ProcessMySql As Process = New Process()
-    Private WithEvents RobustProcess As New Process()
-
-    Private _Language As New Culture
-    Private _PortsChanged As Boolean = True
-
-    Private _Aborting As Boolean = False
-    Private _ApacheProcessID As Integer = 0
-    Private _ApacheUninstalling As Boolean = False
-    Private _ContentAvailable As Boolean = False
-    Private _CPUMAX As Single = 75
-    Private _CurSlashDir As String
-    Private _debugOn As Boolean = False
-    Private _DNSSTimer As Integer = 0
-    Private _Domain As String = "http://www.outworldz.com"
-    Private _ExitHandlerIsBusy As Boolean = False
-    Private _exitList As New ArrayList()
-    Private _ForceMerge As Boolean = False
-    Private _ForceParcel As Boolean = False
-    Private _ForceTerrain As Boolean = False
-    Private _gUseIcons As Boolean = False
-    Private _IcecastProcID As Integer
-    Private _Initted As Boolean = False
-    Private _IPv4Address As String
-    Private _IsRunning As Boolean = False
-    Private _KillSource As Boolean = False
-    Private _MaxPortUsed As Integer = 0
-    Private _myFolder As String
-    Private _mySetting As New MySettings
-    Private _myUPnpMap As UPnp
-    Private _OpensimBinPath As String
-    Private _OldSimVersion As String
-    Private _regionClass As RegionMaker
-    Private _regionForm As RegionList
-    Private _regionHandles As New Dictionary(Of Integer, String)
-    Private _RestartNow As Boolean = False
-    Private _RobustExited As Boolean = False
-    Private _RobustProcID As Integer
-    Private _RestartRobust As Boolean
-
-    Private _RobustCrashCounter As Integer = 0
-    Private _MysqlCrashCounter As Integer = 0
-    Private _ApacheCrashCounter As Integer = 0
-    Private _IcecastCrashCounter As Integer = 0
-    Private _RegionCrashCounter As Integer = 0
-    Private _RestartIceCast As Integer = 0
-    Private _IceCastExited As Integer = 0
-    Private _RestartMysql As Integer = 0
-    Private _MysqlExited As Integer = 0
-    Private _RestartApache As Integer = 0
-    Private _ApacheExited As Integer = 0
-
-    Private _SecureDomain As String = "https://outworldz.com" ' https, which breaks stuff
-    Private _SelectedBox As String = ""
-    Private _StopMysql As Boolean = True
-    Private _UpdateView As Boolean = True
-    Private _invarient As CultureInfo = New CultureInfo("")   ' "" = Invariant Culture
-    Private _UserName As String = ""
-    Private _viewedSettings As Boolean = False
-    Private Adv As AdvancedForm
-    Private cpu As New PerformanceCounter ' Graph
-
-    Private MyCPUCollection(181) As Double
-    Private MyRAMCollection(181) As Double
-    Private speed As Single
-    Private speed1 As Single
-    Private speed2 As Single
-    Private speed3 As Single
-
-    Private ws As NetServer
-
-    Private Update_version As String = Nothing
 
 #End Region
 
@@ -196,12 +259,12 @@ Public Class Form1
 
 #Region "Properties"
 
-    Public Property SimVersion As String
+    Public Property Invarient As CultureInfo
         Get
-            Return _SimVersion
+            Return _invarient
         End Get
-        Set(value As String)
-            _SimVersion = value
+        Set(value As CultureInfo)
+            _invarient = value
         End Set
     End Property
 
@@ -211,6 +274,15 @@ Public Class Form1
         End Get
         Set(value As Boolean)
             _Aborting = value
+        End Set
+    End Property
+
+    Public Property PropApacheExited() As Boolean
+        Get
+            Return _ApacheExited
+        End Get
+        Set(ByVal Value As Boolean)
+            _ApacheExited = Value
         End Set
     End Property
 
@@ -328,6 +400,15 @@ Public Class Form1
         End Set
     End Property
 
+    Public Property PropIceCastExited() As Boolean
+        Get
+            Return _IceCastExited
+        End Get
+        Set(ByVal Value As Boolean)
+            _IceCastExited = Value
+        End Set
+    End Property
+
     Public Property PropIcecastProcID As Integer
         Get
             Return _IcecastProcID
@@ -382,12 +463,12 @@ Public Class Form1
         End Set
     End Property
 
-    Public Property Settings As MySettings
+    Public Property PropMysqlExited() As Boolean
         Get
-            Return _mySetting
+            Return _MysqlExited
         End Get
-        Set(value As MySettings)
-            _mySetting = value
+        Set(ByVal Value As Boolean)
+            _MysqlExited = Value
         End Set
     End Property
 
@@ -451,6 +532,24 @@ Public Class Form1
         End Get
     End Property
 
+    Public Property PropRestartApache() As Boolean
+        Get
+            Return _RestartApache
+        End Get
+        Set(ByVal Value As Boolean)
+            _RestartApache = Value
+        End Set
+    End Property
+
+    Public Property PropRestartMySql() As Boolean
+        Get
+            Return _RestartMysql
+        End Get
+        Set(ByVal Value As Boolean)
+            _RestartMysql = Value
+        End Set
+    End Property
+
     Public Property PropRestartNow As Boolean
         Get
             Return _RestartNow
@@ -466,51 +565,6 @@ Public Class Form1
         End Get
         Set(value As Boolean)
             _RestartRobust = value
-        End Set
-    End Property
-
-    Public Property PropIceCastExited() As Boolean
-        Get
-            Return _IceCastExited
-        End Get
-        Set(ByVal Value As Boolean)
-            _IceCastExited = Value
-        End Set
-    End Property
-
-    Public Property PropRestartMySql() As Boolean
-        Get
-            Return _RestartMysql
-        End Get
-        Set(ByVal Value As Boolean)
-            _RestartMysql = Value
-        End Set
-    End Property
-
-    Public Property PropMysqlExited() As Boolean
-        Get
-            Return _MysqlExited
-        End Get
-        Set(ByVal Value As Boolean)
-            _MysqlExited = Value
-        End Set
-    End Property
-
-    Public Property PropRestartApache() As Boolean
-        Get
-            Return _RestartApache
-        End Get
-        Set(ByVal Value As Boolean)
-            _RestartApache = Value
-        End Set
-    End Property
-
-    Public Property PropApacheExited() As Boolean
-        Get
-            Return _ApacheExited
-        End Get
-        Set(ByVal Value As Boolean)
-            _ApacheExited = Value
         End Set
     End Property
 
@@ -614,12 +668,21 @@ Public Class Form1
         End Set
     End Property
 
-    Public Property Invarient As CultureInfo
+    Public Property Settings As MySettings
         Get
-            Return _invarient
+            Return _mySetting
         End Get
-        Set(value As CultureInfo)
-            _invarient = value
+        Set(value As MySettings)
+            _mySetting = value
+        End Set
+    End Property
+
+    Public Property SimVersion As String
+        Get
+            Return _SimVersion
+        End Get
+        Set(value As String)
+            _SimVersion = value
         End Set
     End Property
 
@@ -1558,6 +1621,58 @@ Public Class Form1
 
     End Sub
 
+    Private Sub DoBirds()
+
+        Dim BirdFile = PropOpensimBinPath & "bin\addon-modules\OpenSimBirds\config\OpenSimBirds.ini"
+        System.IO.File.Delete(BirdFile)
+        Dim BirdData As String = ""
+
+        ' Birds setup per region
+        For Each RegionNum As Integer In PropRegionClass.RegionNumbers
+
+            Dim simName = PropRegionClass.RegionName(RegionNum)
+
+            Settings.LoadIni(PropRegionClass.RegionPath(RegionNum), ";")
+
+            If Settings.BirdsModuleStartup And PropRegionClass.Birds(RegionNum) = "True" Then
+
+                BirdData = BirdData & "[" & simName & "]" & vbCrLf &
+            ";this Is the default And determines whether the module does anything" & vbCrLf &
+            "BirdsModuleStartup = True" & vbCrLf & vbCrLf &
+            ";set to false to disable the birds from appearing in this region" & vbCrLf &
+            "BirdsEnabled = True" & vbCrLf & vbCrLf &
+            ";which channel do we listen on for in world commands" & vbCrLf &
+            "BirdsChatChannel = " & CStr(Settings.BirdsChatChannel) & vbCrLf & vbCrLf &
+            ";the number of birds to flock" & vbCrLf &
+            "BirdsFlockSize = " & CStr(Settings.BirdsFlockSize) & vbCrLf & vbCrLf &
+            ";how far each bird can travel per update" & vbCrLf &
+            "BirdsMaxSpeed = " & Settings.BirdsMaxSpeed.ToString(Invarient) & vbCrLf & vbCrLf &
+            ";the maximum acceleration allowed to the current velocity of the bird" & vbCrLf &
+            "BirdsMaxForce = " & Settings.BirdsMaxForce.ToString(Invarient) & vbCrLf & vbCrLf &
+            ";max distance for other birds to be considered in the same flock as us" & vbCrLf &
+            "BirdsNeighbourDistance = " & Settings.BirdsNeighbourDistance.ToString(Invarient) & vbCrLf & vbCrLf &
+            ";how far away from other birds we would Like To stay" & vbCrLf &
+            "BirdsDesiredSeparation = " & Settings.BirdsDesiredSeparation.ToString(Invarient) & vbCrLf & vbCrLf &
+            ";how close To the edges Of things can we Get without being worried" & vbCrLf &
+            "BirdsTolerance = " & Settings.BirdsTolerance.ToString(Invarient) & vbCrLf & vbCrLf &
+            ";how close To the edge Of a region can we Get?" & vbCrLf &
+            "BirdsBorderSize = " & Settings.BirdsBorderSize.ToString(Invarient) & vbCrLf & vbCrLf &
+            ";how high are we allowed To flock" & vbCrLf &
+            "BirdsMaxHeight = " & Settings.BirdsMaxHeight.ToString(Invarient) & vbCrLf & vbCrLf &
+            ";By Default the Module will create a flock Of plain wooden spheres," & vbCrLf &
+            ";however this can be overridden To the name Of an existing prim that" & vbCrLf &
+            ";needs To already exist In the scene - i.e. be rezzed In the region." & vbCrLf &
+            "BirdsPrim = " & Settings.BirdsPrim & vbCrLf & vbCrLf &
+            ";who Is allowed to send commands via chat Or script List of UUIDs Or ESTATE_OWNER Or ESTATE_MANAGER" & vbCrLf &
+            ";Or everyone if Not specified" & vbCrLf &
+            "BirdsAllowedControllers = ESTATE_OWNER, ESTATE_MANAGER" & vbCrLf & vbCrLf & vbCrLf
+
+            End If
+        Next
+        IO.File.WriteAllText(BirdFile, BirdData, Encoding.Default) 'The text file will be created if it does not already exist
+
+    End Sub
+
     Private Sub DoFlotsamINI()
 
         Settings.LoadIni(PropOpensimBinPath & "bin\config-include\FlotsamCache.ini", ";")
@@ -1594,71 +1709,6 @@ Public Class Form1
         Settings.LoadIni(PropOpensimBinPath & "bin\config-include\GridCommon.ini", ";")
         Settings.SetIni("HGInventoryAccessModule", "OutboundPermission", CStr(Settings.OutBoundPermissions))
         Settings.SaveINI()
-
-    End Sub
-
-    Private Sub EditForeigners()
-
-        ' adds a list like 'Region_Test_1 = "DisallowForeigners"' to Gridcommon.ini
-
-        Dim Authorizationlist As String = ""
-        For Each RegionNum As Integer In PropRegionClass.RegionNumbers
-
-            Dim simName = PropRegionClass.RegionName(RegionNum)
-            '(replace spaces with underscore)
-            simName = simName.Replace(" ", "_")    ' because this is a screwy thing they did in the INI file
-            Dim df As Boolean = False
-            Dim dr As Boolean = False
-            If PropRegionClass.DisallowForeigners(RegionNum) = "True" Then
-                df = True
-            End If
-            If PropRegionClass.DisallowResidents(RegionNum) = "True" Then
-                dr = True
-            End If
-            If Not dr And Not df Then
-
-            ElseIf dr And Not df Then
-                Authorizationlist += "Region_" & simName & " = DisallowResidents" & vbCrLf
-            ElseIf Not dr And df Then
-                Authorizationlist += "Region_" & simName & " = DisallowForeigners" & vbCrLf
-            ElseIf dr And df Then
-                Authorizationlist += "Region_" & simName & " = DisallowResidents " & vbCrLf
-            End If
-
-        Next
-
-        ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        Dim reader As StreamReader
-        Dim line As String
-        Dim Output As String = ""
-
-        reader = System.IO.File.OpenText(PropOpensimBinPath & "bin\config-include\GridCommon.ini")
-        'now loop through each line
-        Dim skip As Boolean = False
-        While reader.Peek <> -1
-            line = reader.ReadLine()
-
-            If line.Contains("; START") Then
-                Output += line & vbCrLf
-                Output += Authorizationlist
-                skip = True
-            ElseIf line.Contains("; END") Then
-                Output += line & vbCrLf
-                skip = False
-            Else
-                If Not skip Then Output += line & vbCrLf
-            End If
-
-        End While
-
-        'close the reader
-        reader.Close()
-
-        FileStuff.DeleteFile(PropOpensimBinPath & "bin\config-include\GridCommon.ini")
-
-        Using outputFile As New StreamWriter(PropOpensimBinPath & "bin\config-include\Gridcommon.ini")
-            outputFile.Write(Output)
-        End Using
 
     End Sub
 
@@ -2120,109 +2170,6 @@ Public Class Form1
 
     End Sub
 
-    Private Sub DoBirds()
-
-        Dim BirdFile = PropOpensimBinPath & "bin\addon-modules\OpenSimBirds\config\OpenSimBirds.ini"
-        System.IO.File.Delete(BirdFile)
-        Dim BirdData As String = ""
-
-        ' Birds setup per region
-        For Each RegionNum As Integer In PropRegionClass.RegionNumbers
-
-            Dim simName = PropRegionClass.RegionName(RegionNum)
-
-            Settings.LoadIni(PropRegionClass.RegionPath(RegionNum), ";")
-
-            If Settings.BirdsModuleStartup And PropRegionClass.Birds(RegionNum) = "True" Then
-
-                BirdData = BirdData & "[" & simName & "]" & vbCrLf &
-            ";this Is the default And determines whether the module does anything" & vbCrLf &
-            "BirdsModuleStartup = True" & vbCrLf & vbCrLf &
-            ";set to false to disable the birds from appearing in this region" & vbCrLf &
-            "BirdsEnabled = True" & vbCrLf & vbCrLf &
-            ";which channel do we listen on for in world commands" & vbCrLf &
-            "BirdsChatChannel = " & CStr(Settings.BirdsChatChannel) & vbCrLf & vbCrLf &
-            ";the number of birds to flock" & vbCrLf &
-            "BirdsFlockSize = " & CStr(Settings.BirdsFlockSize) & vbCrLf & vbCrLf &
-            ";how far each bird can travel per update" & vbCrLf &
-            "BirdsMaxSpeed = " & Settings.BirdsMaxSpeed.ToString(Invarient) & vbCrLf & vbCrLf &
-            ";the maximum acceleration allowed to the current velocity of the bird" & vbCrLf &
-            "BirdsMaxForce = " & Settings.BirdsMaxForce.ToString(Invarient) & vbCrLf & vbCrLf &
-            ";max distance for other birds to be considered in the same flock as us" & vbCrLf &
-            "BirdsNeighbourDistance = " & Settings.BirdsNeighbourDistance.ToString(Invarient) & vbCrLf & vbCrLf &
-            ";how far away from other birds we would Like To stay" & vbCrLf &
-            "BirdsDesiredSeparation = " & Settings.BirdsDesiredSeparation.ToString(Invarient) & vbCrLf & vbCrLf &
-            ";how close To the edges Of things can we Get without being worried" & vbCrLf &
-            "BirdsTolerance = " & Settings.BirdsTolerance.ToString(Invarient) & vbCrLf & vbCrLf &
-            ";how close To the edge Of a region can we Get?" & vbCrLf &
-            "BirdsBorderSize = " & Settings.BirdsBorderSize.ToString(Invarient) & vbCrLf & vbCrLf &
-            ";how high are we allowed To flock" & vbCrLf &
-            "BirdsMaxHeight = " & Settings.BirdsMaxHeight.ToString(Invarient) & vbCrLf & vbCrLf &
-            ";By Default the Module will create a flock Of plain wooden spheres," & vbCrLf &
-            ";however this can be overridden To the name Of an existing prim that" & vbCrLf &
-            ";needs To already exist In the scene - i.e. be rezzed In the region." & vbCrLf &
-            "BirdsPrim = " & Settings.BirdsPrim & vbCrLf & vbCrLf &
-            ";who Is allowed to send commands via chat Or script List of UUIDs Or ESTATE_OWNER Or ESTATE_MANAGER" & vbCrLf &
-            ";Or everyone if Not specified" & vbCrLf &
-            "BirdsAllowedControllers = ESTATE_OWNER, ESTATE_MANAGER" & vbCrLf & vbCrLf & vbCrLf
-
-            End If
-        Next
-        IO.File.WriteAllText(BirdFile, BirdData, Encoding.Default) 'The text file will be created if it does not already exist
-
-    End Sub
-
-    Private Sub DoTides()
-        Dim TideData As String = ""
-        Dim TideFile = PropOpensimBinPath & "bin\addon-modules\OpenSimTide\config\OpenSimTide.ini"
-        System.IO.File.Delete(TideFile)
-
-        For Each RegionNum As Integer In PropRegionClass.RegionNumbers
-            Dim simName = PropRegionClass.RegionName(RegionNum)
-            'Tides Setup per region
-            If Settings.TideEnabled And PropRegionClass.Tides(RegionNum) = "True" Then
-
-                TideData = TideData & ";; Set the Tide settings per named region" & vbCrLf &
-                    "[" & simName & "]" & vbCrLf &
-                ";this determines whether the module does anything in this region" & vbCrLf &
-                ";# {TideEnabled} {} {Enable the tide to come in And out?} {true false} false" & vbCrLf &
-                "TideEnabled = True" & vbCrLf &
-                    vbCrLf &
-                ";; Tides currently only work on single regions And varregions (non megaregions) " & vbCrLf &
-                ";# surrounded completely by water" & vbCrLf &
-                ";; Anything else will produce weird results where you may see a big" & vbCrLf &
-                ";; vertical 'step' in the ocean" & vbCrLf &
-                ";; update the tide every x simulator frames" & vbCrLf &
-                "TideUpdateRate = 50" & vbCrLf &
-                    vbCrLf &
-                ";; low And high water marks in metres" & vbCrLf &
-                "TideHighWater = " & Convert.ToString(Settings.TideHighLevel(), Invarient) & vbCrLf &
-                "TideLowWater = " & Convert.ToString(Settings.TideLowLevel(), Invarient) & vbCrLf &
-                vbCrLf &
-                ";; how long in seconds for a complete cycle time low->high->low" & vbCrLf &
-                "TideCycleTime = " & CStr(Settings.CycleTime()) & vbCrLf &
-                    vbCrLf &
-                ";; provide tide information on the console?" & vbCrLf &
-                "TideInfoDebug = " & CStr(Settings.TideInfoDebug) & vbCrLf &
-                    vbCrLf &
-                ";; chat tide info to the whole region?" & vbCrLf &
-                "TideInfoBroadcast = " & Settings.BroadcastTideInfo() & vbCrLf &
-                    vbCrLf &
-                ";; which channel to region chat on for the full tide info" & vbCrLf &
-                "TideInfoChannel = " & CStr(Settings.TideInfoChannel) & vbCrLf &
-                vbCrLf &
-                ";; which channel to region chat on for just the tide level in metres" & vbCrLf &
-                "TideLevelChannel = " & CStr(Settings.TideLevelChannel()) & vbCrLf &
-                    vbCrLf &
-                ";; How many times to repeat Tide Warning messages at high/low tide" & vbCrLf &
-                "TideAnnounceCount = 1" & vbCrLf & vbCrLf & vbCrLf & vbCrLf
-            End If
-
-        Next
-        IO.File.WriteAllText(TideFile, TideData, Encoding.Default) 'The text file will be created if it does not already exist
-
-    End Sub
-
     Private Sub DoRobust()
 
         ''''''''''''''''''''''''''''''''''''''''''
@@ -2277,6 +2224,57 @@ Public Class Form1
             Settings.SaveINI()
 
         End If
+
+    End Sub
+
+    Private Sub DoTides()
+        Dim TideData As String = ""
+        Dim TideFile = PropOpensimBinPath & "bin\addon-modules\OpenSimTide\config\OpenSimTide.ini"
+        System.IO.File.Delete(TideFile)
+
+        For Each RegionNum As Integer In PropRegionClass.RegionNumbers
+            Dim simName = PropRegionClass.RegionName(RegionNum)
+            'Tides Setup per region
+            If Settings.TideEnabled And PropRegionClass.Tides(RegionNum) = "True" Then
+
+                TideData = TideData & ";; Set the Tide settings per named region" & vbCrLf &
+                    "[" & simName & "]" & vbCrLf &
+                ";this determines whether the module does anything in this region" & vbCrLf &
+                ";# {TideEnabled} {} {Enable the tide to come in And out?} {true false} false" & vbCrLf &
+                "TideEnabled = True" & vbCrLf &
+                    vbCrLf &
+                ";; Tides currently only work on single regions And varregions (non megaregions) " & vbCrLf &
+                ";# surrounded completely by water" & vbCrLf &
+                ";; Anything else will produce weird results where you may see a big" & vbCrLf &
+                ";; vertical 'step' in the ocean" & vbCrLf &
+                ";; update the tide every x simulator frames" & vbCrLf &
+                "TideUpdateRate = 50" & vbCrLf &
+                    vbCrLf &
+                ";; low And high water marks in metres" & vbCrLf &
+                "TideHighWater = " & Convert.ToString(Settings.TideHighLevel(), Invarient) & vbCrLf &
+                "TideLowWater = " & Convert.ToString(Settings.TideLowLevel(), Invarient) & vbCrLf &
+                vbCrLf &
+                ";; how long in seconds for a complete cycle time low->high->low" & vbCrLf &
+                "TideCycleTime = " & CStr(Settings.CycleTime()) & vbCrLf &
+                    vbCrLf &
+                ";; provide tide information on the console?" & vbCrLf &
+                "TideInfoDebug = " & CStr(Settings.TideInfoDebug) & vbCrLf &
+                    vbCrLf &
+                ";; chat tide info to the whole region?" & vbCrLf &
+                "TideInfoBroadcast = " & Settings.BroadcastTideInfo() & vbCrLf &
+                    vbCrLf &
+                ";; which channel to region chat on for the full tide info" & vbCrLf &
+                "TideInfoChannel = " & CStr(Settings.TideInfoChannel) & vbCrLf &
+                vbCrLf &
+                ";; which channel to region chat on for just the tide level in metres" & vbCrLf &
+                "TideLevelChannel = " & CStr(Settings.TideLevelChannel()) & vbCrLf &
+                    vbCrLf &
+                ";; How many times to repeat Tide Warning messages at high/low tide" & vbCrLf &
+                "TideAnnounceCount = 1" & vbCrLf & vbCrLf & vbCrLf & vbCrLf
+            End If
+
+        Next
+        IO.File.WriteAllText(TideFile, TideData, Encoding.Default) 'The text file will be created if it does not already exist
 
     End Sub
 
@@ -2344,6 +2342,71 @@ Public Class Form1
         End If
 
         Settings.SaveINI()
+
+    End Sub
+
+    Private Sub EditForeigners()
+
+        ' adds a list like 'Region_Test_1 = "DisallowForeigners"' to Gridcommon.ini
+
+        Dim Authorizationlist As String = ""
+        For Each RegionNum As Integer In PropRegionClass.RegionNumbers
+
+            Dim simName = PropRegionClass.RegionName(RegionNum)
+            '(replace spaces with underscore)
+            simName = simName.Replace(" ", "_")    ' because this is a screwy thing they did in the INI file
+            Dim df As Boolean = False
+            Dim dr As Boolean = False
+            If PropRegionClass.DisallowForeigners(RegionNum) = "True" Then
+                df = True
+            End If
+            If PropRegionClass.DisallowResidents(RegionNum) = "True" Then
+                dr = True
+            End If
+            If Not dr And Not df Then
+
+            ElseIf dr And Not df Then
+                Authorizationlist += "Region_" & simName & " = DisallowResidents" & vbCrLf
+            ElseIf Not dr And df Then
+                Authorizationlist += "Region_" & simName & " = DisallowForeigners" & vbCrLf
+            ElseIf dr And df Then
+                Authorizationlist += "Region_" & simName & " = DisallowResidents " & vbCrLf
+            End If
+
+        Next
+
+        ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        Dim reader As StreamReader
+        Dim line As String
+        Dim Output As String = ""
+
+        reader = System.IO.File.OpenText(PropOpensimBinPath & "bin\config-include\GridCommon.ini")
+        'now loop through each line
+        Dim skip As Boolean = False
+        While reader.Peek <> -1
+            line = reader.ReadLine()
+
+            If line.Contains("; START") Then
+                Output += line & vbCrLf
+                Output += Authorizationlist
+                skip = True
+            ElseIf line.Contains("; END") Then
+                Output += line & vbCrLf
+                skip = False
+            Else
+                If Not skip Then Output += line & vbCrLf
+            End If
+
+        End While
+
+        'close the reader
+        reader.Close()
+
+        FileStuff.DeleteFile(PropOpensimBinPath & "bin\config-include\GridCommon.ini")
+
+        Using outputFile As New StreamWriter(PropOpensimBinPath & "bin\config-include\Gridcommon.ini")
+            outputFile.Write(Output)
+        End Using
 
     End Sub
 
@@ -3271,7 +3334,7 @@ Public Class Form1
         Buttons(StopButton)
 
         Dim RegionNumber = Regionclass.FindRegionByName(BootName)
-        If Regionclass.SmartStart(RegionNumber) And Settings.SmartStart And Not SkipSmartStart Then
+        If Regionclass.SmartStart(RegionNumber) = "True" And Settings.SmartStart And Not SkipSmartStart Then
             Print("Smart Start " & BootName)
             Return True
         End If
@@ -3465,7 +3528,7 @@ Public Class Form1
                 GroupName = PropRegionClass.GroupName(X)
 
                 ' Smart shutdown
-                If PropRegionClass.SmartStart(X) And Settings.SmartStart And (TimerValue * 6) >= 60 And Not AvatarsIsInGroup(GroupName) Then
+                If PropRegionClass.SmartStart(X) = "True" And Settings.SmartStart And (TimerValue * 6) >= 60 And Not AvatarsIsInGroup(GroupName) Then
                     SequentialPause()
                     ConsoleCommand(PropRegionClass.GroupName(X), "q{ENTER}" & vbCrLf)
                     Print("Smart Stop " & GroupName)
@@ -4638,20 +4701,6 @@ Public Class Form1
 
 #Region "Updates"
 
-    Private Sub UpdaterProcess_Exited(ByVal sender As Object, ByVal e As EventArgs) Handles UpdateProcess.Exited
-
-        Dim ExitCode = UpdateProcess.ExitCode
-        If ExitCode = 0 Then
-            Dim result = MsgBox("Update Version" & Update_version & " has been downloaded. Do you want to exit DreamGrid and install the update?", vbYesNo)
-            If result = vbYes Then
-                UpdaterGo("DreamGrid-V" & Convert.ToString(Update_version, Invarient) & ".zip")
-            End If
-        Else
-            ErrorLog("Could not download an Update: ExitCode=" & CStr(ExitCode))
-        End If
-
-    End Sub
-
     Public Sub CheckForUpdates()
 
         Using client As New WebClient ' download client for web pages
@@ -4745,6 +4794,20 @@ Public Class Form1
             ErrorLog("Error: Could not launch DreamGridInstaller.exe.")
         End Try
         End ' program
+
+    End Sub
+
+    Private Sub UpdaterProcess_Exited(ByVal sender As Object, ByVal e As EventArgs) Handles UpdateProcess.Exited
+
+        Dim ExitCode = UpdateProcess.ExitCode
+        If ExitCode = 0 Then
+            Dim result = MsgBox("Update Version" & Update_version & " has been downloaded. Do you want to exit DreamGrid and install the update?", vbYesNo)
+            If result = vbYes Then
+                UpdaterGo("DreamGrid-V" & Convert.ToString(Update_version, Invarient) & ".zip")
+            End If
+        Else
+            ErrorLog("Could not download an Update: ExitCode=" & CStr(ExitCode))
+        End If
 
     End Sub
 
@@ -4920,6 +4983,32 @@ Public Class Form1
 
     End Sub
 
+    Private Sub PortTest(Weblink As String, Port As Integer)
+
+        Dim result As String = ""
+        Using client As New WebClient
+            Try
+                result = client.DownloadString(Weblink)
+            Catch ex As ArgumentNullException
+                ErrorLog("Err:Loopback fail:" & result & ":" & ex.Message)
+            Catch ex As WebException  ' not an error as could be a 404 from Diva being off
+            Catch ex As NotSupportedException
+                ErrorLog("Err:Loopback fail:" & result & ":" & ex.Message)
+            End Try
+        End Using
+
+        If result.Contains("DOCTYPE") Or result.Contains("Ooops!") Or result.Length = 0 Then
+            Print("Loopback Passed for " & CStr(Port))
+            Log("Info", "Passed:" & result)
+        Else
+            Print("Failed!")
+            Settings.LoopBackDiag = False
+            Settings.DiagFailed = True
+            Log("Info", "Failed:" & result)
+        End If
+
+    End Sub
+
     Private Sub ProbePublicPort()
 
         If Settings.ServerType <> "Robust" Then
@@ -4954,6 +5043,33 @@ Public Class Form1
             Log("Warn", "Failed:" & isPortOpen)
             Print("Internet address " & Settings.PublicIP & ":" & Settings.HttpPort & " appears to not be forwarded to this machine in your router, so Hypergrid is not available. This can possibly be fixed by 'Port Forwards' in your router.  See Help->Port Forwards.")
         End If
+
+    End Sub
+
+    Private Sub TestAllRegionPorts()
+
+        Dim result As String = ""
+        Dim Len = PropRegionClass.RegionCount()
+        Dim counter = 1
+        ProgressBar1.Value = CType(counter / Len, Integer)
+
+        Dim Used As New List(Of String)
+        ' Boot them up
+        For Each X As Integer In PropRegionClass.RegionNumbers()
+            If PropRegionClass.IsBooted(X) Then
+
+                Dim RegionName = PropRegionClass.RegionName(X)
+
+                If Used.Contains(RegionName) Then Continue For
+                Used.Add(RegionName)
+
+                Dim Port = PropRegionClass.GroupPort(X)
+                Print("Checking Loopback for " & RegionName)
+                ProgressBar1.Value = CType(counter / Len * 100, Integer)
+                PortTest("http://" & Settings.PublicIP & ":" & Port & "/?_TestLoopback=" & RandomNumber.Random, Port)
+
+            End If
+        Next
 
     End Sub
 
@@ -4997,59 +5113,6 @@ Public Class Form1
         End If
         Print("Checking Router Loopback")
         PortTest("http://" & Settings.PublicIP & ":" & Settings.HttpPort & "/?_TestLoopback=" & RandomNumber.Random, Settings.HttpPort)
-
-    End Sub
-
-    Private Sub PortTest(Weblink As String, Port As Integer)
-
-        Dim result As String = ""
-        Using client As New WebClient
-            Try
-                result = client.DownloadString(Weblink)
-            Catch ex As ArgumentNullException
-                ErrorLog("Err:Loopback fail:" & result & ":" & ex.Message)
-            Catch ex As WebException  ' not an error as could be a 404 from Diva being off
-            Catch ex As NotSupportedException
-                ErrorLog("Err:Loopback fail:" & result & ":" & ex.Message)
-            End Try
-        End Using
-
-        If result.Contains("DOCTYPE") Or result.Contains("Ooops!") Or result.Length = 0 Then
-            Print("Loopback Passed for " & CStr(Port))
-            Log("Info", "Passed:" & result)
-        Else
-            Print("Failed!")
-            Settings.LoopBackDiag = False
-            Settings.DiagFailed = True
-            Log("Info", "Failed:" & result)
-        End If
-
-    End Sub
-
-    Private Sub TestAllRegionPorts()
-
-        Dim result As String = ""
-        Dim Len = PropRegionClass.RegionCount()
-        Dim counter = 1
-        ProgressBar1.Value = CType(counter / Len, Integer)
-
-        Dim Used As New List(Of String)
-        ' Boot them up
-        For Each X As Integer In PropRegionClass.RegionNumbers()
-            If PropRegionClass.IsBooted(X) Then
-
-                Dim RegionName = PropRegionClass.RegionName(X)
-
-                If Used.Contains(RegionName) Then Continue For
-                Used.Add(RegionName)
-
-                Dim Port = PropRegionClass.GroupPort(X)
-                Print("Checking Loopback for " & RegionName)
-                ProgressBar1.Value = CType(counter / Len * 100, Integer)
-                PortTest("http://" & Settings.PublicIP & ":" & Port & "/?_TestLoopback=" & RandomNumber.Random, Port)
-
-            End If
-        Next
 
     End Sub
 
@@ -5344,21 +5407,6 @@ Public Class Form1
 
     End Function
 
-    Private Sub MakeMysql()
-
-        Dim m As String = PropMyFolder & "\OutworldzFiles\Mysql\"
-        If Not System.IO.File.Exists(m & "\Data\ibdata1") Then
-            Print("Creating new, blank database")
-            Using zip As ZipFile = ZipFile.Read(m & "\Blank-Mysql-Data-folder.zip")
-                For Each ZipEntry In zip
-                    Application.DoEvents()
-                    ZipEntry.Extract(m, Ionic.Zip.ExtractExistingFileAction.OverwriteSilently)
-                Next
-            End Using
-        End If
-
-    End Sub
-
     Private Sub BackupDatabaseToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles BackupDatabaseToolStripMenuItem.Click
 
         BackupDB()
@@ -5424,6 +5472,21 @@ Public Class Form1
         Catch ex As Exception
             ErrorLog("Error:StopMySQL.bat" & ex.Message)
         End Try
+
+    End Sub
+
+    Private Sub MakeMysql()
+
+        Dim m As String = PropMyFolder & "\OutworldzFiles\Mysql\"
+        If Not System.IO.File.Exists(m & "\Data\ibdata1") Then
+            Print("Creating new, blank database")
+            Using zip As ZipFile = ZipFile.Read(m & "\Blank-Mysql-Data-folder.zip")
+                For Each ZipEntry In zip
+                    Application.DoEvents()
+                    ZipEntry.Extract(m, Ionic.Zip.ExtractExistingFileAction.OverwriteSilently)
+                Next
+            End Using
+        End If
 
     End Sub
 
@@ -6140,11 +6203,6 @@ Public Class Form1
 
     End Sub
 
-    Private Sub PDFManualToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles PDFManualToolStripMenuItem.Click
-        Dim webAddress As String = PropMyFolder & "\Outworldzfiles\Help\Dreamgrid Manual.pdf"
-        Process.Start(webAddress)
-    End Sub
-
     Public Sub Viewlog(name As String)
         If name Is Nothing Then Return
         Dim AllLogs As Boolean = False
@@ -6219,6 +6277,11 @@ Public Class Form1
         Dim name As String = sender.text.ToString()
 
         Viewlog(name)
+    End Sub
+
+    Private Sub PDFManualToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles PDFManualToolStripMenuItem.Click
+        Dim webAddress As String = PropMyFolder & "\Outworldzfiles\Help\Dreamgrid Manual.pdf"
+        Process.Start(webAddress)
     End Sub
 
     Private Sub RevisionHistoryToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RevisionHistoryToolStripMenuItem.Click
