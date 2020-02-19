@@ -199,7 +199,7 @@ Public Class FormRegion
             ClampPrimSize.Checked = Form1.PropRegionClass.ClampPrimSize(RegionUUID)
             MaxPrims.Text = Form1.PropRegionClass.MaxPrims(RegionUUID)
             MaxAgents.Text = Form1.PropRegionClass.MaxAgents(RegionUUID)
-
+            RegionPort.Text = Form1.PropRegionClass.RegionPort(RegionUUID)
             ' Size buttons can be zero
             If Form1.PropRegionClass.SizeY(RegionUUID) = 0 Or Form1.PropRegionClass.SizeX(RegionUUID) = 0 Then
                 RadioButton1.Checked = True
